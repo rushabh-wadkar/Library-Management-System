@@ -1,3 +1,5 @@
+<%@page import="java.util.Iterator"%>
+<%@page import="java.util.ArrayList"%>
 <%
     String str = (String)session.getAttribute("user");
     if(!str.equalsIgnoreCase("admin"))
@@ -22,6 +24,7 @@
     int dislikes = 0;
     String time = null;
     
+    ArrayList<String> li = new ArrayList<String>();
       Connection con= null;
       try
       {
@@ -41,6 +44,15 @@
                 likes = rs.getInt("nooflikes");
                 dislikes = rs.getInt("noofdislikes");
                 time = rs.getString("timeday");
+                
+                String query2 = "SELECT * FROM ROOT.\"Transact\" WHERE BOOKNAME='"+bookname+":"+publishername+"' AND ISSUEDATE IS NOT NULL AND EXPIRYDATE IS NOT NULL";
+                // For retreiving users details
+                ResultSet rs1 = st.executeQuery(query2);
+                while(rs1.next())
+                {
+                    li.add(rs1.getString("USERNAME"));
+                }
+                
           }
       }
       catch(Exception e)
@@ -162,6 +174,22 @@
                                           </tr>
                                       </tbody>
                                   </table>
+                                          
+                                          <table class="table table-hover">
+                                              <tbody>
+                                                  <tr data-toggle="collapse" data-target="#issuers" class="accordion-toggle"><td  style="background-color: #00EFFF; border-radius: 20px; border: none;"><center><u>Load Issuers</u></center></td></tr>
+                                                  <tr>
+                                                      <td class="hiddenRow"><center><div id="issuers" class="accordian-body collapse"><%
+                                                                    Iterator itr=li.iterator();//getting Iterator from arraylist to traverse elements  
+                                                                    while(itr.hasNext()){  
+                                                                     %>
+                                                                     <%= itr.next() %><br>
+                                                                     <%
+                                                                    } 
+                                                              %></div></center></td>
+                                                    </tr>
+                                              </tbody>
+                                          </table>
                               </div>
                           </div>
                       </div>

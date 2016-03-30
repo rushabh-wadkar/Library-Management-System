@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.ResultSet;
 import java.sql.Statement;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -41,26 +42,43 @@ public class issue extends HttpServlet {
             
             try(Connection con = DriverManager.getConnection("jdbc:derby://localhost:1527/library", "root", "root"))
             {
-                String query = "INSERT INTO ROOT.\"Transact\"(USERNAME,BOOKNAME,UKEY,STATUS) VALUES('"+username+"','"+BookName+"','"+ukey+"','NA')";
                 
                 Statement st = con.createStatement();
-                int rs = st.executeUpdate(query);
-                if(rs==1)
+                String query2 = "SELECT * FROM ROOT.\"RETURN_TRANSACTION\" WHERE UKEY='"+ukey+"'";
+                ResultSet rs2 = st.executeQuery(query2);
+                if(rs2.next())
                 {
-                    request.setAttribute("status","success");
-                    RequestDispatcher rd = request.getRequestDispatcher("issueBook.jsp");
-                    rd.forward(request, response);
+                    request.setAttribute("status","already");
+                        RequestDispatcher rd = request.getRequestDispatcher("issueBook.jsp");
+                        rd.forward(request, response);
                 }
                 else
                 {
-                    request.setAttribute("status","cantbuy");
-                    RequestDispatcher rd = request.getRequestDispatcher("issueBook.jsp");
-                    rd.forward(request, response);
+                    String query = "INSERT INTO ROOT.\"Transact\"(USERNAME,BOOKNAME,UKEY,STATUS) VALUES('"+username+"','"+BookName+"','"+ukey+"','NA')";
+                
+                    int rs = st.executeUpdate(query);
+                    if(rs==1)
+                    {
+                        request.setAttribute("status","success");
+                        RequestDispatcher rd = request.getRequestDispatcher("issueBook.jsp");
+                        rd.forward(request, response);
+                    }
+                    else
+                    {
+                        request.setAttribute("status","cantbuy");
+                        RequestDispatcher rd = request.getRequestDispatcher("issueBook.jsp");
+                        rd.forward(request, response);
+                    }
                 }
+                /*
+                
+                */
             }
             catch(Exception e)
             {
-                out.println(e);
+                request.setAttribute("status","cantbuy");
+                    RequestDispatcher rd = request.getRequestDispatcher("issueBook.jsp");
+                    rd.forward(request, response);
             }
         }
     }

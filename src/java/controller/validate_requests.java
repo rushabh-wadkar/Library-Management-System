@@ -56,6 +56,11 @@ public class validate_requests extends HttpServlet {
                     String dec = temp[0];
                     String ukey = temp[1];
                     
+                    // for splitting ukey to get the bookname and publisher name
+                    String temp1[] = ukey.split(":");
+                    String bname = temp1[1];
+                    String pname = temp1[2];
+                    
                     if(dec.equalsIgnoreCase("GRANT"))
                     {
                        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
@@ -68,12 +73,22 @@ public class validate_requests extends HttpServlet {
                         String dateExpire = sdf.format(c.getTime());                    //Contains the expiry date.
                         
                         String query = "UPDATE ROOT.\"Transact\" SET ISSUEDATE='"+dateIssue+"', EXPIRYDATE='"+dateExpire+"', STATUS='A' WHERE UKEY='"+ukey+"'";
+                        String updateQuantityQuery = "UPDATE ROOT.\"BOOKS\" SET QUANTITY = QUANTITY - 1 WHERE BOOKNAME='"+bname+"' AND PUBLISHERNAME='"+pname+"'";
                         
                         int rs = st.executeUpdate(query);
                         if(rs==1)
                         {
-                            request.setAttribute("st", "success");
-                            redirect.forward(request, response);
+                            int rs1 = st.executeUpdate(updateQuantityQuery);
+                            if(rs1==1)
+                            {
+                                request.setAttribute("st", "success");
+                                redirect.forward(request, response);
+                            }
+                            else
+                            {
+                                request.setAttribute("st", "error");
+                                redirect.forward(request, response);
+                            }
                         }
                         else
                         {
@@ -109,27 +124,40 @@ public class validate_requests extends HttpServlet {
                             SimpleDateFormat myFormat = new SimpleDateFormat("dd/MM/yyyy");
                             
                             String query1 = "DELETE FROM ROOT.\"RETURN_TRANSACTION\" WHERE UKEY='"+ukey+"'";
+                            
                             int rs1 = st.executeUpdate(query1);
                             if(rs1==1)
                             {
-                                try {
-                                    Date date1 = myFormat.parse(issueRequest);
-                                    Date date2 = myFormat.parse(expiryRequest);
-                                    long diff = date2.getTime() - date1.getTime();
-                                    long calc_days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
-                                    long calc_fine = 0;
-                                    if(calc_days<0)
-                                    {
-                                        calc_fine = Math.abs(calc_days) * 10;
-                                    }
-                                    String redirectInfo = ukey + ":" + issueRequest + ":" + expiryRequest + ":" + calc_fine;
-                                    request.setAttribute("info", redirectInfo);
-                                    RequestDispatcher rd1 = request.getRequestDispatcher("displayFine.jsp");
-                                    rd1.forward(request, response);
-                                    
-                                } catch (ParseException e) {
+                                
+                                String updateQuantityQuery = "UPDATE ROOT.\"BOOKS\" SET QUANTITY = QUANTITY + 1 WHERE BOOKNAME='"+bname+"' AND PUBLISHERNAME='"+pname+"'";
+                                
+                                int rs2 = st.executeUpdate(updateQuantityQuery);
+                                if(rs2==1)
+                                {
+                                    try {
+                                        Date date1 = myFormat.parse(issueRequest);
+                                        Date date2 = myFormat.parse(expiryRequest);
+                                        long diff = date2.getTime() - date1.getTime();
+                                        long calc_days = TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
+                                        long calc_fine = 0;
+                                        if(calc_days<0)
+                                        {
+                                            calc_fine = Math.abs(calc_days) * 10;
+                                        }
+                                        String redirectInfo = ukey + ":" + issueRequest + ":" + expiryRequest + ":" + calc_fine;
+                                        request.setAttribute("info", redirectInfo);
+                                        RequestDispatcher rd1 = request.getRequestDispatcher("displayFine.jsp");
+                                        rd1.forward(request, response);
+                                    } catch (ParseException e) {
                                     e.printStackTrace();
                                 }
+                                }
+                                    else
+                                    {
+                                            out.println("Error in updating quantity");
+                                            }
+                                    
+                                
                             }
                             
                         }

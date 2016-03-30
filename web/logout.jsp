@@ -11,7 +11,7 @@
 <html>
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-        <META http-equiv="refresh" content="2;URL=login.jsp">
+        <META http-equiv="refresh" content="1;URL=login.jsp">
     </head>
     <body>
         logging out.. Please wait!

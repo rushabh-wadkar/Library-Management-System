@@ -184,6 +184,28 @@
                         });
                         <%
                 }
+                else if(status.equalsIgnoreCase("already"))
+                                {
+                                    %>
+                                        $(function(){
+
+                                                PNotify.prototype.options.styling = "bootstrap3";
+                                                    var notice = new PNotify({
+                                                    title: 'Error',
+                                                    text: 'Book already in the RETURN REQUEST to admin.',
+                                                    type: 'error',
+                                                    buttons: {
+                                                        closer: false,
+                                                        sticker: false
+                                                    }
+                                                });
+                                                notice.get().click(function() {
+                                                    window.location.href = "issueBook.jsp";
+                                                    notice.remove();
+                                                });
+                                        });
+                                        <%
+                                }
                 else if(status.equalsIgnoreCase("cantbuy"))
                 {
                     %>
@@ -191,9 +213,9 @@
 
                                 PNotify.prototype.options.styling = "bootstrap3";
                                     var notice = new PNotify({
-                                    title: 'Success',
+                                    title: 'Error',
                                     text: 'You cannot issue the same book twice.<br>Quantity per student is limited to 1',
-                                    type: 'success',
+                                    type: 'error',
                                     buttons: {
                                         closer: false,
                                         sticker: false
