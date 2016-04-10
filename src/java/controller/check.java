@@ -47,6 +47,10 @@ public class check extends HttpServlet {
                 {
                     out.println("<span style='color: red;'>"+ rs.getString("bookname")+" book already present in the Library.</span> <a href='search.jsp?bookname="+ rs.getString("bookname")+"'>Click here!</a>"); 
                 }
+                else
+                {
+                    out.println(" "); 
+                }
             }
             catch(Exception e)
             {

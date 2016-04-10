@@ -85,7 +85,7 @@
                   <div class="form_div">
                       <div class="container">
                           <div class="row">
-                              <center><h2>Oops, the modify feature is not available. Try again later.</h2></center>
+                              <center><h2>Oops, the modify feature is not available currently. Please try again later.</h2></center>
                           </div>
                       </div>
                   </div>
